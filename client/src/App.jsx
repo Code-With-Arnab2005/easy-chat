@@ -32,7 +32,6 @@ function App() {
           },
         }}
       />
-      {/* background picture = bg-[url('./src/assets/bgImage.svg')] bg-contain*/}
       <div className="bg-black text-white">
         <Routes>
           <Route path='/' element={authUser ? <HomePage /> : <Navigate to="/login" />} />
