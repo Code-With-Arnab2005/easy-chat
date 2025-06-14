@@ -76,20 +76,6 @@ const setBio = async (req, res) => {
     }
 }
 
-// const logout = async (req, res) => {
-//     try {
-//         const { userId } = req.user._id;
-//         const user = await User.findById(userId)
-//         if (!user) {
-//             return res.json({ success: false, message: "User not found" });
-//         }
-
-//     } catch (error) {
-//         console.log(error.message);
-//         return res.json({ success: false, message: error.message });
-//     }
-// }
-
 const updateProfilePicture = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -117,7 +103,6 @@ export {
     signup,
     login,
     setBio,
-    // logout,
     updateProfilePicture,
     getCurrentUser,
 

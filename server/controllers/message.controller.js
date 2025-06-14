@@ -2,6 +2,7 @@ import { uploadOnCloudinary } from "../lib/cloudinary.js";
 import Message from "../models/Message.model.js";
 import User from "../models/User.model.js";
 import { io, userSocketMap } from "../server.js";
+import { getBotReply } from "./chatbot.controller.js";
 
 const sendMessage = async (req, res) => {
     try {
@@ -31,9 +32,32 @@ const sendMessage = async (req, res) => {
         if(receiverSocketId){
             io.to(receiverSocketId).emit("newMessage", newMessage)
         }
-    
 
-        return res.json({ success: true, message: "Message sent successsfully", message: newMessage })
+        console.log("sendmessage controller newmessage: ", newMessage)
+        res.json({ success: true, message: "Message sent successsfully", message: newMessage })
+
+
+        //create logic for chatbot reply
+        const receiver = await User.findById(receiverId);
+        if(receiver?.email === 'metabot@chat.com'){
+            const botReply = await getBotReply(text);
+            if(botReply){
+                const newBotMessage = await Message.create({
+                    senderId: receiverId,
+                    receiverId: senderId,
+                    text: botReply,
+                    image: imageUrl
+                })
+                if(newBotMessage){
+                    //now send this reply of chatbot to the sender user
+                    const senderSocketId = userSocketMap[senderId];
+                    if(senderSocketId){
+                        io.to(senderSocketId).emit("newMessage", newBotMessage);
+                    }
+                }
+            }
+
+        }
     } catch (error) {
         console.log(error.message);
         return res.json({ success: false, message: error.message });
