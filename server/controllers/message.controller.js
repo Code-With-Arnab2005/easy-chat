@@ -33,10 +33,10 @@ const sendMessage = async (req, res) => {
             io.to(receiverSocketId).emit("newMessage", newMessage)
         }
 
-        console.log("sendmessage controller newmessage: ", newMessage)
         res.json({ success: true, message: "Message sent successsfully", message: newMessage })
-
-
+        
+        
+        // console.log("sendmessage controller newmessage: ", newMessage)
         //create logic for chatbot reply
         const receiver = await User.findById(receiverId);
         if(receiver?.email === 'metabot@chat.com'){

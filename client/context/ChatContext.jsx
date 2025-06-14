@@ -45,7 +45,7 @@ export const ChatProvider = ({children}) => {
         try {
             // console.log("messageData: ", messageData)
             const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
-            console.log("sendmessage: ", data)
+            // console.log("sendmessage: ", data)
             if(data.success){
                 setMessages((prev) => [...prev, data.message]);
             } else {
