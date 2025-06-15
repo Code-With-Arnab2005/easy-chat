@@ -12,12 +12,14 @@ export const ChatProvider = ({children}) => {
     const [unseenMessages, setUnseenMessages] = useState({});
     const [loadingChat, setLoadingChat] = useState(false);
     const [sendingChat, setSendingChat] = useState(false);
+    const [sidebarUserLoading, setSidebarUserLoading] = useState(false);
 
     const { axios, socket } = useContext(AuthContext);
 
     //function to get all users for sidebar
     const getAllUsersForSidebar = async() => {
         try {
+            setSidebarUserLoading(true);
             const {data} = await axios.get("/api/messages/users");
             if(data.success){
                 setUsers(data.users);
@@ -27,6 +29,8 @@ export const ChatProvider = ({children}) => {
             }
         } catch (error) {
             toast.error(error?.response?.data?.message || error?.message || "Something went wrong");
+        } finally {
+            setSidebarUserLoading(false);
         }
     }
 
@@ -101,7 +105,19 @@ export const ChatProvider = ({children}) => {
     }, [socket, selectedUser])
 
     const value = {
-        messages, users, selectedUser, getAllUsersForSidebar, setMessages, sendMessage, setSelectedUser, unseenMessages, setUnseenMessages, getMessagesForSelectedUser, loadingChat, sendingChat
+        messages,
+        users,
+        selectedUser,
+        getAllUsersForSidebar,
+        setMessages,
+        sendMessage,
+        setSelectedUser,
+        unseenMessages,
+        setUnseenMessages,
+        getMessagesForSelectedUser,
+        loadingChat,
+        sendingChat,
+        sidebarUserLoading
     }
 
     return <ChatContext.Provider value={value}>

@@ -4,10 +4,11 @@ import { AuthContext } from "../../context/AuthContext";
 import { useContext } from "react";
 import assets from "../assets/assets";
 import { ChatContext } from "../../context/ChatContext";
+import LargeLoader from "../components/LargeLoader";
 
 const Sidebar = () => {
 
-  const { getAllUsersForSidebar, users, setSelectedUser, selectedUser, unseenMessages, setUnseenMessages } = useContext(ChatContext);
+  const { getAllUsersForSidebar, users, setSelectedUser, selectedUser, unseenMessages, setUnseenMessages, sidebarUserLoading } = useContext(ChatContext);
 
   const { onlineUsers, authUser, logout } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,7 +35,7 @@ const Sidebar = () => {
 
   // For Search Filter
   useEffect(() => {
-    if(users?.length > 0){
+    if (users?.length > 0) {
       const filtered = users.filter((user) => (
         user?.fullname.toLowerCase().includes(searchInput.toLowerCase())
       ))
@@ -99,53 +100,60 @@ const Sidebar = () => {
 
       {/* User List */}
       <ul className="divide-y divide-zinc-800">
-        {filteredUsers.map((user) => (
-          <li
-            key={user._id}
-            className={`border-b-2 border-zinc-800 flex justify-between items-center pr-3 hover:bg-zinc-700 hover:cursor-pointer ${user._id === selectedUser?._id && "bg-zinc-800"}`}
-            onClick={() => {
-              setSelectedUser(user)
-              setUnseenMessages(prev => ({ ...prev, [user._id]: 0 }));
-            }}
-          >
-            <div className="flex items-center gap-4 p-4 cursor-pointer ">
-              {/* Profile Image */}
-              <div className="relative">
-                <img
-                  src={user.profilePicture || "/default-avatar.png"}
-                  alt={user.fullname}
-                  className="w-10 h-10 rounded-full object-cover border border-zinc-700"
-                />
-                <span
-                  className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-zinc-900 ${onlineUsers.includes(user._id)
-                    ? "bg-green-500"
-                    : "bg-zinc-500"
-                    }`}
-                />
-              </div>
-
-              {/* Name */}
-              <div>
-                <p className="text-sm font-medium">{user.fullname}</p>
-              </div>
-
-              {/* Admin */}
-              {user.email === import.meta.env.VITE_ADMIN_EMAIL && (
-                <div className="text-center bg-gray-700 text-gray-400 rounded-xl p-2 text-[8px]">
-                  Admin
-                </div>
-              )}
-
-              {/* Chatbot */}
-              {user.email === import.meta.env.VITE_CHATBOT_EMAIL && (
-                <div className="text-center bg-gray-700 text-gray-400 rounded-xl p-2 text-[8px]">
-                  Chatbot
-                </div>
-              )}
+        {sidebarUserLoading ?
+          (
+            <div className="flex items-center h-full justify-center mt-10">
+              <LargeLoader />
             </div>
-            {unseenMessages[user._id]>0 && <span className="w-6 h-6 flex items-center justify-center text-xs font-bold rounded-full border-2 border-white bg-white text-black">{unseenMessages[user._id]}</span>}
-          </li>
-        ))}
+          )  : (
+            filteredUsers.map((user) => (
+              <li
+                key={user._id}
+                className={`border-b-2 border-zinc-800 flex justify-between items-center pr-3 hover:bg-zinc-700 hover:cursor-pointer ${user._id === selectedUser?._id && "bg-zinc-800"}`}
+                onClick={() => {
+                  setSelectedUser(user)
+                  setUnseenMessages(prev => ({ ...prev, [user._id]: 0 }));
+                }}
+              >
+                <div className="flex items-center gap-4 p-4 cursor-pointer ">
+                  {/* Profile Image */}
+                  <div className="relative">
+                    <img
+                      src={user.profilePicture || "/default-avatar.png"}
+                      alt={user.fullname}
+                      className="w-10 h-10 rounded-full object-cover border border-zinc-700"
+                    />
+                    <span
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-zinc-900 ${onlineUsers.includes(user._id)
+                        ? "bg-green-500"
+                        : "bg-zinc-500"
+                        }`}
+                    />
+                  </div>
+
+                  {/* Name */}
+                  <div>
+                    <p className="text-sm font-medium">{user.fullname}</p>
+                  </div>
+
+                  {/* Admin */}
+                  {user.email === import.meta.env.VITE_ADMIN_EMAIL && (
+                    <div className="text-center bg-gray-700 text-gray-400 rounded-xl p-2 text-[8px]">
+                      Admin
+                    </div>
+                  )}
+
+                  {/* Chatbot */}
+                  {user.email === import.meta.env.VITE_CHATBOT_EMAIL && (
+                    <div className="text-center bg-gray-700 text-gray-400 rounded-xl p-2 text-[8px]">
+                      Chatbot
+                    </div>
+                  )}
+                </div>
+                {unseenMessages[user._id] > 0 && <span className="w-6 h-6 flex items-center justify-center text-xs font-bold rounded-full border-2 border-white bg-white text-black">{unseenMessages[user._id]}</span>}
+              </li>
+            ))
+          )}
       </ul>
 
     </aside>
