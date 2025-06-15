@@ -15,6 +15,7 @@ export const AuthProvider = ({children}) => {
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [socket, setSocket] = useState(null);
     const [loadingAuth, setLoadingAuth] = useState(true);
+    const [isTyping, setIsTyping] = useState(false);
 
     const chechAuth = async() => {
         setLoadingAuth(true);
@@ -25,7 +26,7 @@ export const AuthProvider = ({children}) => {
                 connectSocket(data.userData);
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error?.response?.data?.message || error?.message || "Something went wrong")
         } finally {
             setLoadingAuth(false);
         }
@@ -81,7 +82,7 @@ export const AuthProvider = ({children}) => {
         try {
             const { data } = await axios.post("/api/auth/update-profile-picture", body);
             if(data.success){
-                setAuthUser(user.userData);
+                setAuthUser(data.userData);
                 toast.success(data.message);
             }
         } catch (error) {
@@ -103,6 +104,31 @@ export const AuthProvider = ({children}) => {
             setOnlineUsers(userId)
         })
 
+        //typing events
+        newSocket.on("show-typing", ({ senderId }) => {
+            setIsTyping(senderId);
+        })
+        newSocket.on("hide-typing", ({ senderId }) => {
+            setIsTyping(false);
+        })
+    }
+
+    const emitTyping = (receiverId) => {
+        if(socket && socket.connected){
+            socket.emit("typing", {
+                senderId: authUser?._id,
+                receiverId 
+            })
+        }
+    }
+
+    const emitStopTyping = (receiverId) => {
+        if(socket && socket.connected){
+            socket.emit("stop-typing", {
+                senderId: authUser?._id,
+                receiverId
+            })
+        }
     }
 
     useEffect(() => {
@@ -121,7 +147,10 @@ export const AuthProvider = ({children}) => {
         logout,
         updateBio,
         updateProfilePicture,
-        loadingAuth
+        loadingAuth,
+        emitTyping,
+        emitStopTyping,
+        isTyping,
     }
 
     return (
