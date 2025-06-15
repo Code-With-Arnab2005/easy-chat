@@ -43,7 +43,7 @@ const ChatContainer = () => {
   return (
     <div className="flex flex-col w-[100%] h-full bg-zinc-950 text-white">
       {/* Header */}
-      <div className="flex justify-between items-center border-b-2 border-white px-4 py-3 bg-zinc-900">
+      <div className="flex justify-between items-center border-b-2 border-zinc-500 px-4 py-3 bg-zinc-900">
         <div className="flex items-center gap-3">
           <img
             src={selectedUser.profilePicture || "/default-avatar.png"}
@@ -94,7 +94,7 @@ const ChatContainer = () => {
       {/* Optional: Typing or Message Input */}
       {/* <MessageInput /> */}
 
-      <div className="flex items-center justify-center w-full min-h-15 border-t-2 border-l-2 border-white">
+      <div className="flex items-center justify-center w-full min-h-15 border-t-2 border-l-2 border-zinc-500">
         <textarea
           type="text"
           className="px-5 text-start w-full h-full outline-none border-none"

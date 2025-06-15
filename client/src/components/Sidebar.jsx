@@ -11,10 +11,13 @@ const Sidebar = () => {
 
   const { onlineUsers, authUser, logout } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
   const navigate = useNavigate();
   const menuRef = useRef();
 
-  const allUsers = users || [];
   // console.log(allUsers)
 
   // Close dropdown if clicked outside
@@ -29,10 +32,21 @@ const Sidebar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // For Search Filter
+  useEffect(() => {
+    if(users?.length > 0){
+      const filtered = users.filter((user) => (
+        user?.fullname.toLowerCase().includes(searchInput.toLowerCase())
+      ))
+      setFilteredUsers(filtered);
+    }
+  }, [searchInput, users])
+
   return (
-    <aside className="w-[20vw] lg:w-80 border-r-2 border-white bg-zinc-900 text-white h-screen overflow-y-auto">
+    <aside className="w-[30%] border-r-2 border-zinc-500 bg-zinc-900 text-white h-screen overflow-y-auto">
+
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 relative">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-500 relative">
         <div className="flex items-center gap-2">
           <img src={assets.logo_icon} alt="Logo" className="w-9" />
           <h2 className="text-xl font-semibold">EasyChat</h2>
@@ -72,12 +86,23 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="border-b-2 border-zinc-500">
+        <input
+          type="text"
+          placeholder="Search a user..."
+          className="w-[95%] border-2 border-gray-500 rounded-lg my-2 mx-2 px-2 py-2"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
+
       {/* User List */}
       <ul className="divide-y divide-zinc-800">
-        {allUsers.map((user) => (
+        {filteredUsers.map((user) => (
           <li
             key={user._id}
-            className={`flex justify-between items-center pr-3 hover:bg-zinc-700 hover:cursor-pointer ${user._id === selectedUser?._id && "bg-zinc-800"}`}
+            className={`border-b-2 border-zinc-800 flex justify-between items-center pr-3 hover:bg-zinc-700 hover:cursor-pointer ${user._id === selectedUser?._id && "bg-zinc-800"}`}
             onClick={() => {
               setSelectedUser(user)
               setUnseenMessages(prev => ({ ...prev, [user._id]: 0 }));
@@ -103,11 +128,26 @@ const Sidebar = () => {
               <div>
                 <p className="text-sm font-medium">{user.fullname}</p>
               </div>
+
+              {/* Admin */}
+              {user.email === import.meta.env.VITE_ADMIN_EMAIL && (
+                <div className="text-center bg-gray-700 text-gray-400 rounded-xl p-2 text-[8px]">
+                  Admin
+                </div>
+              )}
+
+              {/* Chatbot */}
+              {user.email === import.meta.env.VITE_CHATBOT_EMAIL && (
+                <div className="text-center bg-gray-700 text-gray-400 rounded-xl p-2 text-[8px]">
+                  Chatbot
+                </div>
+              )}
             </div>
             {unseenMessages[user._id]>0 && <span className="w-6 h-6 flex items-center justify-center text-xs font-bold rounded-full border-2 border-white bg-white text-black">{unseenMessages[user._id]}</span>}
           </li>
         ))}
       </ul>
+
     </aside>
   );
 };

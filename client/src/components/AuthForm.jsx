@@ -27,7 +27,6 @@ const AuthForm = ({ type }) => {
             } catch (error) {
                 console.log("some error occured", error)
             }
-
         } else {
             try {
                 await login('login', {email, password});

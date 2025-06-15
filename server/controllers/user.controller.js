@@ -9,6 +9,9 @@ const signup = async (req, res) => {
         if (!fullname || !email || !password) {
             return res.json({ success: false, message: "All fields are required" });
         }
+        if(email===process.env.CHATBOT_EMAIL){
+            return res.json({ success: false, message: "This email is secured, Please create account with another Email Id" })
+        }
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.json({ success: false, message: "User already exists, sign-up with another email" });
@@ -36,6 +39,9 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.json({ success: false, message: "All fields are required" });
+        }
+        if(email===process.env.CHATBOT_EMAIL){
+            return res.json({ success: false, message: "This email is secured, Please create account with another Email Id" })
         }
         const user = await User.findOne({ email });
         if (!user) {

@@ -39,7 +39,7 @@ const sendMessage = async (req, res) => {
         // console.log("sendmessage controller newmessage: ", newMessage)
         //create logic for chatbot reply
         const receiver = await User.findById(receiverId);
-        if(receiver?.email === 'metabot@chat.com'){
+        if(receiver?.email === process.env.CHATBOT_EMAIL){
             const botReply = await getBotReply(text);
             if(botReply){
                 const newBotMessage = await Message.create({
